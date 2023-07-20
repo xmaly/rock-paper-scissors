@@ -4,36 +4,49 @@ function getComputerChoice() {
     return possibilities[Math.floor(Math.random() * 3)];
 }
 
+const playerPoints = document.getElementById("player-points");
+const computerPoints = document.getElementById("computer-points");
+const message = document.getElementById("message");
+
+function checkWin() {
+    return playerPoints.textContent >= 5 || computerPoints.textContent >= 5;
+};
+
+const choiceButtons = document.querySelectorAll('.choice');
+choiceButtons.forEach(button => {
+    button.addEventListener('click', () => playRound(button.textContent.toLowerCase(), getComputerChoice()));
+});
+
 function playRound(playerSelection, computerSelection) {
     if (playerSelection === computerSelection) {
+        message.textContent = "Round was a draw.";
         return "Draw.";
     } else if (playerSelection === "rock" && computerSelection === "scissors" ||
-        playerSelection === "paper" && computerSelection === "stone" ||
+        playerSelection === "paper" && computerSelection === "rock" ||
         playerSelection === "scissors" && computerSelection === "paper") {
-        return "Player won.";
+            message.textContent = "Player won.";
+            playerPoints.textContent = parseInt(playerPoints.textContent) + 1;
+            if (checkWin()) {
+                choiceButtons.forEach(button => {
+                    button.disabled = true;
+                });
+            }
+            return "Player won.";
     } else {
+        message.textContent = "Computer won.";
+        computerPoints.textContent = parseInt(computerPoints.textContent) + 1;
+        if (checkWin()) {
+            choiceButtons.forEach(button => button.disabled = true);
+        }
         return "Computer won.";
     } 
 }
 
-function game() {
-    let playerPoints = 0;
-    let computerPoints = 0;
-
-    console.log("Game begins");
-    while (playerPoints < 5 && computerPoints < 5) {
-        let playerTool = prompt("Select tool:").toLowerCase();
-        let computerTool = getComputerChoice();
-
-        let roundResult = playRound(playerTool, computerTool);
-        if (roundResult.includes("Player")) {
-            playerPoints++;
-        } else if (roundResult.includes("Computer")) {
-            computerPoints++;
-        }
-    }
-
-    let winner = playerPoints === 5 ? "Player" : "Computer";
-
-    console.log(`Game over. ${winner} has won! The final score was ${playerPoints}:${computerPoints}`)
-}
+const startButton = document.querySelector('.start');
+startButton.addEventListener('click', () => {
+    playerPoints.textContent = 0;
+    computerPoints.textContent = 0;  
+    choiceButtons.forEach(button => {
+        button.disabled = false;
+    });  
+});
